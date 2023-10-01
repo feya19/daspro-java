@@ -1,7 +1,7 @@
 
 ## Screenshots
 
-![App Screenshot](./image/ssan.jpeg)
+(./image/ssan.jpeg)
 
 
 # Fitur
