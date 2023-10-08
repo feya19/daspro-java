@@ -17,7 +17,7 @@ public class Kantin {
             System.exit(0);
         }
 
-        String namaBarang;
+        String namaBarang, jenisPembayaran;
         float diskon, ppn;
         double harga, total, hargaDiskon, totalDiskon, totalPpn;
         
@@ -37,6 +37,27 @@ public class Kantin {
 
         System.out.println("Total transaksi anda " + String.format("%.2f", total));
 
+        System.out.println("Pilih Jenis Pembayaran: ");
+        System.out.println("1. Cash");
+        System.out.println("2. Cashless");
+        int pilihPembayaran = input.nextInt();
+        if (pilihPembayaran == 1) {
+            jenisPembayaran = "Tunai";
+        } else {
+            System.out.println("Pilih Metode Pembayaran Cashless: ");
+            System.out.println("1. QRIS");
+            System.out.println("2. Transfer Bank");
+            int metodePembayaran = input.nextInt();
+            if (metodePembayaran == 1) {
+                jenisPembayaran = "QRIS";
+            } else {
+                jenisPembayaran = "Transfer Bank";
+            }
+        }
+        System.out.println("Metode Pembayaran : "+jenisPembayaran);
+
         input.close();
     }
 }
+
+// 1. Jenis Pembayaran, 2. Voucher, 3. PO, 4. Charge for cashless payment, 5. Bayar & Kembali
