@@ -3,20 +3,27 @@ import java.util.Scanner;
 public class Kantin {
     
     private static final String SECRET_PIN = "123456";
+    private static final int MAX_ATTEMPTS = 3;
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
-        System.out.print("Masukkan PIN: ");
-        String enteredPin = input.nextLine();
+        for (int attempts = 1; attempts <= MAX_ATTEMPTS; attempts++) {
+            System.out.print("Masukkan PIN: ");
+            String enteredPin = input.nextLine();
 
-        if (enteredPin.equals(SECRET_PIN)) {
-            System.out.println("PIN benar. Akses diberikan.");
-        } else {
-            System.out.print("\nPIN salah. ");
-            System.exit(0);
+            if (enteredPin.equals(SECRET_PIN)) {
+                System.out.println("PIN benar. Akses diberikan.");
+                break;
+            } else {
+                System.out.print("\nPIN salah. ");
+                if (attempts == 3) {
+                    System.exit(0);
+                }
+                System.out.print("Coba lagi.\n");
+            }
         }
-
+        
         String namaBarang, jenisPembayaran;
         float diskon, ppn;
         double harga, total, hargaDiskon, totalDiskon, totalPpn;
