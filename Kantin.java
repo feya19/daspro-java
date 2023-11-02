@@ -26,26 +26,79 @@ public class Kantin {
         
         String namaBarang, jenisPembayaran;
         float diskon, ppn;
-        double harga, total = 0, hargaDiskon = 0, totalDiskon = 0, totalPpn = 0;
+        double harga, totalItem, total = 0, hargaDiskon = 0, totalDiskon = 0, totalPpn = 0, charge = 1000;
         
+        String[] makanan = {"Nasi Goreng", "Mie Goreng", "Ayam Bakar"};
+        double[] hargaMakanan = {10000, 8000, 12000};
+
+        String[] minuman = {"Es Teh", "Es Jeruk", "Kopi"};
+        double[] hargaMinuman = {3000, 3500, 4000};
+
         while (true) {
-            System.out.print("Masukkan nama barang : ");
-            namaBarang = input.next();
-            System.out.print("Masukkan harga barang : ");
-            harga = input.nextDouble();
-            System.out.print("Masukkan Diskon (%): ");
-            diskon = input.nextFloat() / 100;
-            System.out.print("Masukkan PPN (%): ");
-            ppn = input.nextFloat() / 100;
+            System.out.println("\nMenu:");
+            System.out.println("1. Makanan");
+            System.out.println("2. Minuman");
+            System.out.println("3. Selesai Belanja");
+            int pilihan = input.nextInt();
 
-            hargaDiskon = harga * diskon;
-            totalDiskon = harga - hargaDiskon;
-            totalPpn = totalDiskon * ppn;
-            total += totalDiskon + totalPpn;
+            if (pilihan == 1) {
+                System.out.println("Pilih makanan:");
+                for (int i = 0; i < makanan.length; i++) {
+                    System.out.println(i + 1 + ". " + makanan[i] + " - Rp" + hargaMakanan[i]);
+                }
+                int foodChoice = input.nextInt();
+                if (foodChoice >= 1 && foodChoice <= makanan.length) {
+                    harga = hargaMakanan[foodChoice - 1];
+                    System.out.print("Masukkan Diskon (%): ");
+                    diskon = input.nextFloat() / 100;
+                    System.out.print("Masukkan PPN (%): ");
+                    ppn = input.nextFloat() / 100;
 
-            System.out.println("Tambah Barang: (y/n)");
-            if (input.next().equalsIgnoreCase("n")) {
+                    hargaDiskon = harga * diskon;
+                    totalDiskon = harga - hargaDiskon;
+                    totalPpn = totalDiskon * ppn;
+                    totalItem = totalDiskon + totalPpn;
+                    total += totalItem;
+
+                    System.out.println("Total harga " + makanan[foodChoice - 1] + ": " + String.format("%.2f", totalItem));
+                    System.out.println("Tambah Menu: (y/n)");
+                    if (input.next().equalsIgnoreCase("n")) {
+                        break;
+                    }
+                } else {
+                    System.out.println("Pilihan makanan tidak valid.");
+                }
+            } else if (pilihan == 2) {
+                System.out.println("Pilih minuman:");
+                for (int i = 0; i < minuman.length; i++) {
+                    System.out.println(i + 1 + ". " + minuman[i] + " - Rp" + hargaMinuman[i]);
+                }
+                int drinkChoice = input.nextInt();
+                if (drinkChoice >= 1 && drinkChoice <= minuman.length) {
+                    harga = hargaMinuman[drinkChoice - 1];
+                    System.out.print("Masukkan Diskon (%): ");
+                    diskon = input.nextFloat() / 100;
+                    System.out.print("Masukkan PPN (%): ");
+                    ppn = input.nextFloat() / 100;
+
+                    hargaDiskon = harga * diskon;
+                    totalDiskon = harga - hargaDiskon;
+                    totalPpn = totalDiskon * ppn;
+                    totalItem = totalDiskon + totalPpn;
+                    total += totalItem;
+
+                    System.out.println("Total harga " + minuman[drinkChoice - 1] + ": " + String.format("%.2f", totalItem));
+                    System.out.println("Tambah Menu: (y/n)");
+                    if (input.next().equalsIgnoreCase("n")) {
+                        break;
+                    }
+                } else {
+                    System.out.println("Pilihan minuman tidak valid.");
+                }
+            } else if (pilihan == 3) {
                 break;
+            } else {
+                System.out.println("Pilihan tidak valid.");
             }
         }
 
@@ -70,6 +123,28 @@ public class Kantin {
             }
         }
         System.out.println("Metode Pembayaran : "+jenisPembayaran);
+        System.out.printf("Jumlah yang harus dibayarkan: %.2f \n", total);
+
+        double bayar = 0, kembali = 0;
+
+        if (pilihPembayaran == 1) {
+            while (true) {
+                System.out.print("Bayar: ");
+                bayar = input.nextDouble();
+                if (bayar >= total) {
+                    kembali = bayar - total;
+                    break;
+                } else {
+                    System.out.println("Pembayaran kurang dari total transaksi");
+                }
+            }
+        } else {
+            bayar = total;
+            System.out.printf("Biaya Layanan: %.2f \n", charge);
+            System.out.printf("Bayar: %.2f \n", bayar);
+        }
+
+        System.out.printf("Kembali: %.2f", kembali);
 
         input.close();
     }
