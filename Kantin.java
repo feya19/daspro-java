@@ -1,26 +1,38 @@
+import java.io.Console;
 import java.util.Scanner;
 
 public class Kantin {
-    private static final String SECRET_PIN = "123456";
+    private static final String[] usernames = {"inventaris", "kasir", "owner"};
+    private static final String[] passwords = {"pass_inventaris", "pass_kasir", "pass_owner"};
+    private static final String[] roles = {"Inventaris", "Kasir", "Owner"};
     private static final int MAX_ATTEMPTS = 3;
     private static final double CHARGE_CASHLESS = 1000;
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
+        Console console = System.console();
+        int userIndex = -1;
 
         for (int attempts = 1; attempts <= MAX_ATTEMPTS; attempts++) {
-            System.out.print("Masukkan PIN: ");
-            String enteredPin = input.nextLine();
+            System.out.print("Masukkan username: ");
+            String enteredUsername = input.nextLine();
+            System.out.print("Masukkan password: ");
+            char[] passwordChars = console.readPassword();
+            String enteredPassword = new String(passwordChars);
 
-            if (enteredPin.equals(SECRET_PIN)) {
-                System.out.println("PIN benar. Akses diberikan.");
+            userIndex = authenticateUser(enteredUsername, enteredPassword);
+
+            if (userIndex != -1) {
+                String role = roles[userIndex];
+                System.out.println("Login berhasil. Selamat datang, " + role + ".");
                 break;
             } else {
-                System.out.print("\nPIN salah. ");
+                System.out.print("\nUsername atau password salah. ");
                 if (attempts == 3) {
+                    System.out.println("Anda telah melebihi batas percobaan. Aplikasi keluar.");
                     System.exit(0);
                 }
-                System.out.print("Coba lagi.\n");
+                System.out.println("Coba lagi.\n");
             }
         }
 
@@ -42,7 +54,7 @@ public class Kantin {
             System.out.println("\nMenu:");
             System.out.println("1. Makanan");
             System.out.println("2. Minuman");
-            System.out.println("3. Selesai Belanja");
+            System.out.println("3. Selesai Belanja\n");
             int pilihan = input.nextInt();
 
             if (pilihan == 1 || pilihan == 2) {
@@ -124,5 +136,14 @@ public class Kantin {
         System.out.printf("Kembali: %.2f", kembali);
 
         input.close();
+    }
+
+    private static int authenticateUser(String username, String password) {
+        for (int i = 0; i < usernames.length; i++) {
+            if (usernames[i].equals(username) && passwords[i].equals(password)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
