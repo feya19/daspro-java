@@ -1,4 +1,3 @@
-import java.io.Console;
 import java.util.Scanner;
 
 public class Kantin {
@@ -10,50 +9,46 @@ public class Kantin {
     private static final int MAX_ATTEMPTS = 3;
     private static final double CHARGE_CASHLESS = 1000;
 
+    static String[][] menuItems = {
+        {"Nasi Goreng", "Mie Goreng", "Ayam Bakar"},
+        {"Es Teh", "Es Jeruk", "Kopi"}
+    };
+
+    static double[][] menuPrices = {
+        {10000, 8000, 12000},
+        {3000, 3500, 4000}
+    };
+
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
-        Console console = System.console();
-        int userIndex = -1;
+        int userIndex = authenticateUser(input);
 
-        for (int attempts = 1; attempts <= MAX_ATTEMPTS; attempts++) {
-            System.out.print("Masukkan username: ");
-            String enteredUsername = input.nextLine();
-            System.out.print("Masukkan password: ");
-            char[] passwordChars = console.readPassword();
-            String enteredPassword = new String(passwordChars);
-
-            userIndex = authenticateUser(enteredUsername, enteredPassword);
-
-            if (userIndex != -1) {
-                String role = roles[userIndex];
-                System.out.println("Login berhasil. Selamat datang, " + role + ".");
+        switch (userIndex) {
+            case 0:
+                
                 break;
-            } else {
-                System.out.print("\nUsername atau password salah. ");
-                if (attempts == 3) {
-                    System.out.println("Anda telah melebihi batas percobaan. Aplikasi keluar.");
-                    System.exit(0);
-                }
-                System.out.println("Coba lagi.\n");
-            }
+            case 1:
+                orderProcess(input, false);
+                break;
+        
+            default:
+                break;
+        }
+
+        input.close();
+    }
+
+    public static void orderProcess(Scanner input, boolean exit) {
+        if (exit) {
+            System.exit(0);
         }
 
         String jenisPembayaran = "";
-        System.out.print("Masukkan nama pelanggan: ");
+        System.out.print("\nMasukkan nama pelanggan: ");
         String pelanggan = input.nextLine();
 
         double charge = 0;
         double total = 0;
-
-        String[][] menuItems = {
-                {"Nasi Goreng", "Mie Goreng", "Ayam Bakar"},
-                {"Es Teh", "Es Jeruk", "Kopi"}
-        };
-
-        double[][] menuPrices = {
-                {10000, 8000, 12000},
-                {3000, 3500, 4000}
-        };
 
         while (true) {
             System.out.println("\nMenu:");
@@ -100,7 +95,7 @@ public class Kantin {
         if (isMember(pelanggan)) {
             System.out.println("\nTotal: " + String.format("%.2f", total));
             System.out.println("Berhasil mendapatkan member diskon (%): "+ memberDiskon);
-            total *= 100 - memberDiskon;
+            total -= total * memberDiskon / 100;
         }
 
         System.out.println("Total transaksi yang harus dibayar " + String.format("%.2f", total));
@@ -146,16 +141,41 @@ public class Kantin {
 
         System.out.printf("Kembali: %.2f", kembali);
 
-        input.close();
+        System.out.println("\n1. Transaksi");
+        System.out.println("2. Exit");
+        int order = input.nextInt();
+        orderProcess(input, order == 1 ? false : true);
     }
-
-    private static int authenticateUser(String username, String password) {
-        for (int i = 0; i < usernames.length; i++) {
-            if (usernames[i].equals(username) && passwords[i].equals(password)) {
-                return i;
+    
+    private static int authenticateUser(Scanner input) {
+        int userIndex = -1;
+        for (int attempts = 1; attempts <= MAX_ATTEMPTS; attempts++) {
+            System.out.print("Masukkan username: ");
+            String enteredUsername = input.nextLine();
+            System.out.print("Masukkan password: ");
+            String enteredPassword = input.nextLine();
+            
+            for (int i = 0; i < usernames.length; i++) {
+                if (usernames[i].equals(enteredUsername) && passwords[i].equals(enteredPassword)) {
+                    userIndex = i;
+                }
+            };
+            
+            if (userIndex != -1) {
+                String role = roles[userIndex];
+                System.out.println("Login berhasil. Selamat datang, " + role + ".");
+                break;
+            } else {
+                System.out.print("\nUsername atau password salah. ");
+                if (attempts == 3) {
+                    System.out.println("Anda telah melebihi batas percobaan. Aplikasi keluar.");
+                    System.exit(0);
+                }
+                System.out.println("Coba lagi.\n");
             }
         }
-        return -1;
+
+        return userIndex;
     }
 
     public static boolean isMember(String customerName) {
