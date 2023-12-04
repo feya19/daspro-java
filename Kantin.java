@@ -5,6 +5,8 @@ public class Kantin {
     private static final String[] usernames = {"inventaris", "kasir", "owner"};
     private static final String[] passwords = {"pass_inventaris", "pass_kasir", "pass_owner"};
     private static final String[] roles = {"Inventaris", "Kasir", "Owner"};
+    private static final String[] members = {"Yatno", "Yanti", "Budi"};
+    private static final float memberDiskon = 5;
     private static final int MAX_ATTEMPTS = 3;
     private static final double CHARGE_CASHLESS = 1000;
 
@@ -37,6 +39,9 @@ public class Kantin {
         }
 
         String jenisPembayaran = "";
+        System.out.print("Masukkan nama pelanggan: ");
+        String pelanggan = input.nextLine();
+
         double charge = 0;
         double total = 0;
 
@@ -92,9 +97,15 @@ public class Kantin {
             }
         }
 
-        System.out.println("Total transaksi anda " + String.format("%.2f", total));
+        if (isMember(pelanggan)) {
+            System.out.println("\nTotal: " + String.format("%.2f", total));
+            System.out.println("Berhasil mendapatkan member diskon (%): "+ memberDiskon);
+            total *= 100 - memberDiskon;
+        }
 
-        System.out.println("Menu Jenis Pembayaran:");
+        System.out.println("Total transaksi yang harus dibayar " + String.format("%.2f", total));
+
+        System.out.println("\nMenu Jenis Pembayaran:");
         System.out.println("1. Cash");
         System.out.println("2. Cashless");
 
@@ -145,5 +156,14 @@ public class Kantin {
             }
         }
         return -1;
+    }
+
+    public static boolean isMember(String customerName) {
+        for (String member : members) {
+            if (member.equalsIgnoreCase(customerName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
