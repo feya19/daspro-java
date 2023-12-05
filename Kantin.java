@@ -1,9 +1,11 @@
 import java.util.Scanner;
 
 public class Kantin {
-    private static final String[] usernames = {"inventaris", "kasir", "owner"};
-    private static final String[] passwords = {"pass_inventaris", "pass_kasir", "pass_owner"};
-    private static final String[] roles = {"Inventaris", "Kasir", "Owner"};
+    private static final String[][] users = {
+        {"inventaris", "pass_inventaris", "Inventaris"},
+        {"kasir", "pass_kasir", "Kasir"},
+        {"owner", "pass_owner", "Owner"}
+    };
     private static final String[] members = {"Yatno", "Yanti", "Budi"};
     private static final float memberDiskon = 5;
     private static final int MAX_ATTEMPTS = 3;
@@ -155,14 +157,14 @@ public class Kantin {
             System.out.print("Masukkan password: ");
             String enteredPassword = input.nextLine();
             
-            for (int i = 0; i < usernames.length; i++) {
-                if (usernames[i].equals(enteredUsername) && passwords[i].equals(enteredPassword)) {
+            for (int i = 0; i < users.length; i++) {
+                if (users[i][0].equals(enteredUsername) && users[i][1].equals(enteredPassword)) {
                     userIndex = i;
                 }
-            };
+            }
             
             if (userIndex != -1) {
-                String role = roles[userIndex];
+                String role = users[userIndex][2];
                 System.out.println("Login berhasil. Selamat datang, " + role + ".");
                 break;
             } else {
