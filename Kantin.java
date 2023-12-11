@@ -30,6 +30,16 @@ public class Kantin {
         {0, 0, 0},
         {0, 0, 0}
     };
+    
+    static int[][] stockAdjustments = {
+        {0, 0, 0},
+        {0, 0, 0}
+    };
+
+    static double[][] menuHpp = {
+        {8000, 6000, 10000},
+        {2500, 3000, 3500}
+    };
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
@@ -223,12 +233,14 @@ public class Kantin {
                     if (editChoice >= 1 && editChoice <= menuItems.length) {
                         int editMenuIndex = editChoice - 1;
                         System.out.println("\nMenu yang dipilih:");
-                        System.out.println(String.format("%s - Rp%.2f - Stock: %d", menuItems[editMenuIndex][0], menuPrices[editMenuIndex][0], menuStock[editMenuIndex][0]));
+                        System.out.println(String.format("%s - Rp%.2f - Stock: %d - Hpp: %.2f", menuItems[editMenuIndex][0], menuPrices[editMenuIndex][0], menuStock[editMenuIndex][0], menuHpp[editMenuIndex][0]));
     
                         System.out.println("\n--- Edit ---");
                         System.out.println("1. Edit nama");
                         System.out.println("2. Edit stok");
-                        System.out.println("3. Kembali");
+                        System.out.println("3. Edit harga");
+                        System.out.println("4. Edit hpp");
+                        System.out.println("5. Kembali");
                         System.out.print("Pilihan: ");
     
                         int editOption = input.nextInt();
@@ -247,9 +259,24 @@ public class Kantin {
                                 System.out.print("Penyesuaian stok: ");
                                 int stockAdjustment = input.nextInt();
                                 menuStock[editMenuIndex][0] = stockAdjustment;
+                                stockAdjustments[editMenuIndex][0] += stockAdjustment * (stockAdjustment > menuStock[editMenuIndex][0] ? 1 : -1);
                                 System.out.println("Stok menu berhasil diubah.");
                                 break;
                             case 3:
+                                // Edit item price
+                                System.out.print("Harga baru: ");
+                                double newPrice = input.nextDouble();
+                                menuPrices[editMenuIndex][0] = newPrice;
+                                System.out.println("Harga menu berhasil diubah.");
+                                break;
+                            case 4:
+                                // Edit item hpp
+                                System.out.print("Hpp baru: ");
+                                double newHpp = input.nextDouble();
+                                menuHpp[editMenuIndex][0] = newHpp;
+                                System.out.println("Hpp menu berhasil diubah.");
+                                break;
+                            case 5:
                                 // Back to inventory menu
                                 break;
                             default:
@@ -303,19 +330,29 @@ public class Kantin {
     
         public static void generateReportPenjualan() {
             System.out.println("\n--- Report Penjualan ---");
-            System.out.printf("%-4s|%-20s|%-10s|%-12s\n", "No", "Menu", "Terjual", "Pendapatan");
+            System.out.printf("%-4s|%-20s|%-10s|%-12s\n", "No", "Menu", "Terjual", "Hpp", "Pendapatan");
             
             for (int i = 0; i < menuItems.length; i++) {
                 for (int j = 0; j < menuItems[i].length; j++) {
                     int terjual = menuStockMutasi[i][j];
                     double pendapatan = terjual * menuPrices[i][j];
-                    System.out.printf("%-4s|%-20s|%-10s|%-12s\n", (i * menuItems[i].length + j + 1), menuItems[i][j], terjual, "Rp. " + pendapatan);
+                    double hpp = terjual * menuHpp[i][j];
+                    System.out.printf("%-4s|%-20s|%-10s|%-12s|%-10s|%-12s\n", (i * menuItems[i].length + j + 1), menuItems[i][j], terjual, "Rp. " + pendapatan, "Rp. " + hpp, "Rp. " + pendapatan);
                 }
             }
         }
     
         public static void generateReportPenyesuaian() {
-    
+            System.out.println("\n--- Report Penyesuaian ---");
+            System.out.printf("%-4s|%-20s|%-10s|%-12s\n", "No", "Menu", "Perubahan", "Nilai (Rp)");
+        
+            for (int i = 0; i < menuItems.length; i++) {
+                for (int j = 0; j < menuItems[i].length; j++) {
+                    int perubahan = stockAdjustments[i][j];
+                    double nilai = perubahan * menuPrices[i][j];
+                    System.out.printf("%-4s|%-20s|%-10s|%-12s\n", (i * menuItems[i].length + j + 1), menuItems[i][j], perubahan, "Rp. " + nilai);
+                }
+            }
         }
     
     private static int authenticateUser(Scanner input) {
