@@ -271,8 +271,52 @@ public class Kantin {
     }
 
     public static void report(Scanner input, boolean exit) {
-        
-    }
+        if (exit) {
+            main(null);
+        }
+    
+        while (true) {
+            System.out.println("\n--- Report Menu ---");
+            System.out.println("1. Report Penjualan");
+            System.out.println("2. Report Penyesuaian");
+            System.out.println("3. Exit");
+            System.out.print("Pilihan: ");
+    
+            int choice = input.nextInt();
+    
+            switch (choice) {
+                case 1:
+                    generateReportPenjualan();
+                    break;
+                case 2:
+                    generateReportPenyesuaian();
+                    break;
+                case 3:
+                    report(input, true);
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid.");
+                    break;
+            }
+        }
+        }
+    
+        public static void generateReportPenjualan() {
+            System.out.println("\n--- Report Penjualan ---");
+            System.out.printf("%-4s|%-20s|%-10s|%-12s\n", "No", "Menu", "Terjual", "Pendapatan");
+            
+            for (int i = 0; i < menuItems.length; i++) {
+                for (int j = 0; j < menuItems[i].length; j++) {
+                    int terjual = menuStockMutasi[i][j];
+                    double pendapatan = terjual * menuPrices[i][j];
+                    System.out.printf("%-4s|%-20s|%-10s|%-12s\n", (i * menuItems[i].length + j + 1), menuItems[i][j], terjual, "Rp. " + pendapatan);
+                }
+            }
+        }
+    
+        public static void generateReportPenyesuaian() {
+    
+        }
     
     private static int authenticateUser(Scanner input) {
         int userIndex = -1;
