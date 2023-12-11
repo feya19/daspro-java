@@ -21,18 +21,39 @@ public class Kantin {
         {3000, 3500, 4000}
     };
 
+    static int[][] menuStock = {
+        {10, 80, 12},
+        {30, 35, 40}
+    };
+
+    static int[][] menuStockMutasi = {
+        {0, 0, 0},
+        {0, 0, 0}
+    };
+
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
+
+        System.out.println("\n--- Selamat datang di Sistem Kantin JTI Polinema ---");
+        System.out.println("1. Login");
+        System.out.println("2. Close Program");
+        System.out.print("Pilihan: ");
+        if (input.nextInt() != 1) {
+            System.exit(0);
+        }
+        input.nextLine();
         int userIndex = authenticateUser(input);
 
         switch (userIndex) {
             case 0:
-                
+                inventory(input, false);
                 break;
             case 1:
                 orderProcess(input, false);
                 break;
-        
+            case 2:
+                report(input, false);
+                break;
             default:
                 break;
         }
@@ -42,21 +63,22 @@ public class Kantin {
 
     public static void orderProcess(Scanner input, boolean exit) {
         if (exit) {
-            System.exit(0);
+           main(null);
         }
 
         String jenisPembayaran = "";
-        System.out.print("\nMasukkan nama pelanggan: ");
+        System.out.println("\n-----Transaksi-----");
+        System.out.print("Masukkan nama pelanggan: ");
         String pelanggan = input.nextLine();
 
         double charge = 0;
         double total = 0;
+        boolean noProducts = true;
 
         while (true) {
-            System.out.println("\nMenu:");
+            System.out.println("\n--- Menu ---");
             System.out.println("1. Makanan");
             System.out.println("2. Minuman");
-            System.out.println("3. Selesai Belanja\n");
             int pilihan = input.nextInt();
 
             if (pilihan == 1 || pilihan == 2) {
@@ -69,31 +91,55 @@ public class Kantin {
 
                 int itemChoice = input.nextInt();
                 if (itemChoice >= 1 && itemChoice <= menuItems[categoryIndex].length) {
-                    double harga = menuPrices[categoryIndex][itemChoice - 1];
-                    System.out.print("Masukkan Diskon (%): ");
-                    double diskon = input.nextFloat() / 100;
-                    System.out.print("Masukkan PPN (%): ");
-                    double ppn = input.nextFloat() / 100;
+                    if (menuStock[categoryIndex][itemChoice - 1] > 0) {
+                        System.out.print("Masukkan Jumlah: ");
+                        int jumlah = input.nextInt();
+                        if (menuStock[categoryIndex][itemChoice - 1] < jumlah) {
+                            System.out.println("Maaf, stok menu " + menuItems[categoryIndex][itemChoice - 1] + " tidak cukup.");
+                            System.out.println("Tambah Menu Lain: (y/n)");
+                            if (input.next().equalsIgnoreCase("n")) {
+                                input.nextLine();
+                                break;
+                            }
+                            continue;
+                        }
 
-                    double hargaDiskon = harga * diskon;
-                    double totalItem = (harga - hargaDiskon) * (1 + ppn);
-                    total += totalItem;
+                        double harga = menuPrices[categoryIndex][itemChoice - 1];
+                        System.out.print("Masukkan Diskon (%): ");
+                        double diskon = input.nextFloat() / 100;
+                        System.out.print("Masukkan PPN (%): ");
+                        double ppn = input.nextFloat() / 100;
 
-                    System.out.println("Total harga " + menuItems[categoryIndex][itemChoice - 1] + ": " + String.format("%.2f", totalItem));
-                    System.out.println("Tambah Menu: (y/n)");
+                        harga *= jumlah;
+                        double hargaDiskon = harga * diskon;
+                        double totalItem = (harga - hargaDiskon) * (1 + ppn);
+                        total += totalItem;
+
+                        System.out.println("Total harga " + menuItems[categoryIndex][itemChoice - 1] + ": " + String.format("%.2f", totalItem));
+                        menuStock[categoryIndex][itemChoice - 1] -= jumlah;
+                        menuStockMutasi[categoryIndex][itemChoice - 1] += jumlah;
+                        noProducts = false;
+                    } else {
+                        System.out.println("Maaf, stok menu " + menuItems[categoryIndex][itemChoice - 1] + " sudah habis.");
+                    }
+                    
+                    System.out.println("Tambah Menu Lain: (y/n)");
                     if (input.next().equalsIgnoreCase("n")) {
                         break;
                     }
                 } else {
                     System.out.println("Pilihan menu tidak valid.");
                 }
-            } else if (pilihan == 3) {
-                break;
             } else {
                 System.out.println("Pilihan tidak valid.");
             }
         }
 
+        if (noProducts) {
+            System.out.println("Tidak ada menu yang terpilih");
+            orderProcess(input, false);
+        }
+    
         if (isMember(pelanggan)) {
             System.out.println("\nTotal: " + String.format("%.2f", total));
             System.out.println("Berhasil mendapatkan member diskon (%): "+ memberDiskon);
@@ -145,8 +191,87 @@ public class Kantin {
 
         System.out.println("\n1. Transaksi");
         System.out.println("2. Exit");
+        System.out.print("Pilihan: ");
         int order = input.nextInt();
+        input.nextLine();
         orderProcess(input, order == 1 ? false : true);
+    }
+    
+    public static void inventory(Scanner input, boolean exit) {
+        if (exit) {
+           main(null);
+        }
+    
+        while (true) {
+            System.out.println("\n--- Menu ---");
+            System.out.println("1. Edit Menu Items");
+            System.out.println("2. Exit");
+            System.out.print("Pilihan: ");
+    
+            int choice = input.nextInt();
+    
+            switch (choice) {
+                case 1:
+                    System.out.println("\n--- Edit Menu ---");
+                    for (int i = 0; i < menuItems.length; i++) {
+                        System.out.println(String.format("%d. %s - Rp%.2f - Stock: %d", i + 1, menuItems[i][0], menuPrices[i][0], menuStock[i][0]));
+                    }
+                    System.out.println("");
+                    System.out.print("Pilih menu: ");
+                    int editChoice = input.nextInt();
+    
+                    if (editChoice >= 1 && editChoice <= menuItems.length) {
+                        int editMenuIndex = editChoice - 1;
+                        System.out.println("\nMenu yang dipilih:");
+                        System.out.println(String.format("%s - Rp%.2f - Stock: %d", menuItems[editMenuIndex][0], menuPrices[editMenuIndex][0], menuStock[editMenuIndex][0]));
+    
+                        System.out.println("\n--- Edit ---");
+                        System.out.println("1. Edit nama");
+                        System.out.println("2. Edit stok");
+                        System.out.println("3. Kembali");
+                        System.out.print("Pilihan: ");
+    
+                        int editOption = input.nextInt();
+                        input.nextLine();
+    
+                        switch (editOption) {
+                            case 1:
+                                // Edit item name
+                                System.out.print("Nama baru: ");
+                                String newName = input.nextLine();
+                                menuItems[editMenuIndex][0] = newName;
+                                System.out.println("Nama menu berhasil diubah.");
+                                break;
+                            case 2:
+                                // Edit item stock
+                                System.out.print("Penyesuaian stok: ");
+                                int stockAdjustment = input.nextInt();
+                                menuStock[editMenuIndex][0] = stockAdjustment;
+                                System.out.println("Stok menu berhasil diubah.");
+                                break;
+                            case 3:
+                                // Back to inventory menu
+                                break;
+                            default:
+                                System.out.println("Pilihan tidak valid.");
+                                break;
+                        }
+                    } else {
+                        System.out.println("Pilihan menu tidak valid.");
+                    }
+                    break;
+                case 2:
+                    inventory(input, true);
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid.");
+                    break;
+            }
+        }
+    }
+
+    public static void report(Scanner input, boolean exit) {
+        
     }
     
     private static int authenticateUser(Scanner input) {
