@@ -41,6 +41,10 @@ public class Kantin {
         {2500, 3000, 3500}
     };
 
+    static int maxTransaction = 100;
+    static int transactionCount = 0;
+    static String[][] transactions = new String[maxTransaction][6];
+
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
@@ -73,14 +77,20 @@ public class Kantin {
 
     public static void orderProcess(Scanner input, boolean exit) {
         if (exit) {
-           main(null);
+            main(null);
         }
 
-        String jenisPembayaran = "";
+        if (maxTransaction == transactionCount) {
+            System.out.println("Telah Mencapai Batas Transaksi");
+            main(null);
+        }
+
+        String jenisPembayaran = "Cash";
         System.out.println("\n-----Transaksi-----");
         System.out.print("Masukkan nama pelanggan: ");
         String pelanggan = input.nextLine();
 
+        double hpp = 0;
         double charge = 0;
         double total = 0;
         boolean noProducts = true;
@@ -128,6 +138,7 @@ public class Kantin {
                         System.out.println("Total harga " + menuItems[categoryIndex][itemChoice - 1] + ": " + String.format("%.2f", totalItem));
                         menuStock[categoryIndex][itemChoice - 1] -= jumlah;
                         menuStockMutasi[categoryIndex][itemChoice - 1] += jumlah;
+                        hpp += menuHpp[categoryIndex][itemChoice - 1] * jumlah;
                         noProducts = false;
                     } else {
                         System.out.println("Maaf, stok menu " + menuItems[categoryIndex][itemChoice - 1] + " sudah habis.");
@@ -175,8 +186,6 @@ public class Kantin {
             } else {
                 System.out.println("Pilihan metode pembayaran cashless tidak valid.");
             }
-        } else if (pilihPembayaran != 1) {
-            System.out.println("Pilihan jenis pembayaran tidak valid.");
         }
 
         System.out.println("Metode Pembayaran: " + jenisPembayaran);
@@ -198,6 +207,8 @@ public class Kantin {
         }
 
         System.out.printf("Kembali: %.2f", kembali);
+        transactions[transactionCount] = new String[]{pelanggan, jenisPembayaran, String.format("%.2f", hpp), String.format("%.2f", total), String.format("%.2f", bayar), String.format("%.2f", kembali)};
+        transactionCount++;
 
         System.out.println("\n1. Transaksi");
         System.out.println("2. Exit");
@@ -217,24 +228,21 @@ public class Kantin {
             System.out.println("1. Edit Menu Items");
             System.out.println("2. Exit");
             System.out.print("Pilihan: ");
-    
+
             int choice = input.nextInt();
-    
+
             switch (choice) {
                 case 1:
                     System.out.println("\n--- Edit Menu ---");
                     for (int i = 0; i < menuItems.length; i++) {
-                        System.out.println(String.format("%d. %s - Rp%.2f - Stock: %d", i + 1, menuItems[i][0], menuPrices[i][0], menuStock[i][0]));
+                        for (int j = 0; j < menuItems[i].length; j++) {
+                            System.out.println(String.format("%d. %s - Rp%.2f - Stock: %d", (i * menuItems[i].length + j + 1), menuItems[i][j], menuPrices[i][j], menuStock[i][j]));
+                        }
                     }
-                    System.out.println("");
                     System.out.print("Pilih menu: ");
-                    int editChoice = input.nextInt();
-    
-                    if (editChoice >= 1 && editChoice <= menuItems.length) {
-                        int editMenuIndex = editChoice - 1;
-                        System.out.println("\nMenu yang dipilih:");
-                        System.out.println(String.format("%s - Rp%.2f - Stock: %d - Hpp: %.2f", menuItems[editMenuIndex][0], menuPrices[editMenuIndex][0], menuStock[editMenuIndex][0], menuHpp[editMenuIndex][0]));
-    
+                    int editMenuIndex = input.nextInt() - 1;
+
+                    if (editMenuIndex >= 0 && editMenuIndex < menuItems.length * menuItems[0].length) {
                         System.out.println("\n--- Edit ---");
                         System.out.println("1. Edit nama");
                         System.out.println("2. Edit stok");
@@ -242,38 +250,41 @@ public class Kantin {
                         System.out.println("4. Edit hpp");
                         System.out.println("5. Kembali");
                         System.out.print("Pilihan: ");
-    
+
                         int editOption = input.nextInt();
                         input.nextLine();
-    
+
+                        int categoryIndex = editMenuIndex / menuItems[0].length;
+                        int menuItemIndex = editMenuIndex % menuItems[0].length;
+
                         switch (editOption) {
                             case 1:
                                 // Edit item name
                                 System.out.print("Nama baru: ");
                                 String newName = input.nextLine();
-                                menuItems[editMenuIndex][0] = newName;
+                                menuItems[categoryIndex][menuItemIndex] = newName;
                                 System.out.println("Nama menu berhasil diubah.");
                                 break;
                             case 2:
                                 // Edit item stock
                                 System.out.print("Penyesuaian stok: ");
                                 int stockAdjustment = input.nextInt();
-                                menuStock[editMenuIndex][0] = stockAdjustment;
-                                stockAdjustments[editMenuIndex][0] += stockAdjustment * (stockAdjustment > menuStock[editMenuIndex][0] ? 1 : -1);
+                                menuStock[categoryIndex][menuItemIndex] = stockAdjustment;
+                                stockAdjustments[categoryIndex][menuItemIndex] += stockAdjustment * (stockAdjustment > menuStock[categoryIndex][menuItemIndex] ? 1 : -1);
                                 System.out.println("Stok menu berhasil diubah.");
                                 break;
                             case 3:
                                 // Edit item price
                                 System.out.print("Harga baru: ");
                                 double newPrice = input.nextDouble();
-                                menuPrices[editMenuIndex][0] = newPrice;
+                                menuPrices[categoryIndex][menuItemIndex] = newPrice;
                                 System.out.println("Harga menu berhasil diubah.");
                                 break;
                             case 4:
                                 // Edit item hpp
                                 System.out.print("Hpp baru: ");
                                 double newHpp = input.nextDouble();
-                                menuHpp[editMenuIndex][0] = newHpp;
+                                menuHpp[categoryIndex][menuItemIndex] = newHpp;
                                 System.out.println("Hpp menu berhasil diubah.");
                                 break;
                             case 5:
@@ -330,21 +341,16 @@ public class Kantin {
     
         public static void generateReportPenjualan() {
             System.out.println("\n--- Report Penjualan ---");
-            System.out.printf("%-4s|%-20s|%-10s|%-12s\n", "No", "Menu", "Terjual", "Hpp", "Pendapatan");
+            System.out.printf("%-4s|%-20s|%-16s|%-12s|%-10s|%-12s|%-10s|%-10s\n", "No", "Pelanggan", "Jenis Pembayaran", "Hpp", "Total", "Bayar", "Kembali", "Keuntungan");
             
-            for (int i = 0; i < menuItems.length; i++) {
-                for (int j = 0; j < menuItems[i].length; j++) {
-                    int terjual = menuStockMutasi[i][j];
-                    double pendapatan = terjual * menuPrices[i][j];
-                    double hpp = terjual * menuHpp[i][j];
-                    System.out.printf("%-4s|%-20s|%-10s|%-12s|%-10s|%-12s\n", (i * menuItems[i].length + j + 1), menuItems[i][j], terjual, "Rp. " + pendapatan, "Rp. " + hpp, "Rp. " + pendapatan);
-                }
+            for (int i = 0; i < transactionCount; i++) {
+                System.out.printf("%-4s|%-20s|%-16s|%-12s|%-10s|%-12s|%-10s|%-10s\n", (i + 1), transactions[i][0], transactions[i][1], transactions[i][2], transactions[i][3], transactions[i][4], transactions[i][5], Double.parseDouble(transactions[i][3]) - Double.parseDouble(transactions[i][2]));
             }
         }
     
         public static void generateReportPenyesuaian() {
             System.out.println("\n--- Report Penyesuaian ---");
-            System.out.printf("%-4s|%-20s|%-10s|%-12s\n", "No", "Menu", "Perubahan", "Nilai (Rp)");
+            System.out.printf("%-4s|%-20s|%-10s|%-12s\n", "No", "Menu", "Perubahan", "Nilai");
         
             for (int i = 0; i < menuItems.length; i++) {
                 for (int j = 0; j < menuItems[i].length; j++) {
@@ -357,6 +363,7 @@ public class Kantin {
     
     private static int authenticateUser(Scanner input) {
         int userIndex = -1;
+        System.out.println("-----Log in-----");
         for (int attempts = 1; attempts <= MAX_ATTEMPTS; attempts++) {
             System.out.print("Masukkan username: ");
             String enteredUsername = input.nextLine();
