@@ -99,6 +99,7 @@ public class Kantin {
             System.out.println("\n--- Menu ---");
             System.out.println("1. Makanan");
             System.out.println("2. Minuman");
+            System.out.print("Pilihan: ");
             int pilihan = input.nextInt();
 
             if (pilihan == 1 || pilihan == 2) {
@@ -108,6 +109,7 @@ public class Kantin {
                 for (int i = 0; i < menuItems[categoryIndex].length; i++) {
                     System.out.println(i + 1 + ". " + menuItems[categoryIndex][i] + " - Rp" + menuPrices[categoryIndex][i]);
                 }
+                System.out.print("Pilihan: ");
 
                 int itemChoice = input.nextInt();
                 if (itemChoice >= 1 && itemChoice <= menuItems[categoryIndex].length) {
