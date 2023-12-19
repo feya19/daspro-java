@@ -363,7 +363,7 @@ public class Kantin {
             for (int i = 0; i < menuItems.length; i++) {
                 for (int j = 0; j < menuItems[i].length; j++) {
                     int perubahan = stockAdjustments[i][j];
-                    double nilai = perubahan * menuPrices[i][j];
+                    double nilai = perubahan * menuHpp[i][j];
                     System.out.printf("%-4s|%-20s|%-10s|%-12s\n", (i * menuItems[i].length + j + 1), menuItems[i][j], perubahan, nilai);
                 }
             }
