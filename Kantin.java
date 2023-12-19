@@ -41,9 +41,9 @@ public class Kantin {
         {2500, 3000, 3500}
     };
 
-    static int maxTransaction = 100;
+    static final int maxTransaction = 100;
     static int transactionCount = 0;
-    static String[][] transactions = new String[maxTransaction][6];
+    static String[][] transactions = new String[maxTransaction][7];
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
@@ -104,7 +104,7 @@ public class Kantin {
             if (pilihan == 1 || pilihan == 2) {
                 int categoryIndex = pilihan - 1; // Adjusting for array index
 
-                System.out.println("Pilih menu:");
+                System.out.println("\nPilih menu:");
                 for (int i = 0; i < menuItems[categoryIndex].length; i++) {
                     System.out.println(i + 1 + ". " + menuItems[categoryIndex][i] + " - Rp" + menuPrices[categoryIndex][i]);
                 }
@@ -167,7 +167,7 @@ public class Kantin {
             total -= total * memberDiskon / 100;
         }
 
-        System.out.println("Total transaksi yang harus dibayar " + String.format("%.2f", total));
+        System.out.println("Total transaksi " + String.format("%.2f", total));
 
         System.out.println("\nMenu Jenis Pembayaran:");
         System.out.println("1. Cash");
@@ -175,21 +175,20 @@ public class Kantin {
 
         int pilihPembayaran = input.nextInt();
         if (pilihPembayaran == 2) {
-            System.out.println("Pilih Metode Pembayaran Cashless:");
+            System.out.println("\nPilih Metode Pembayaran Cashless:");
             System.out.println("1. QRIS");
             System.out.println("2. Transfer Bank");
 
             int metodePembayaran = input.nextInt();
-            if (metodePembayaran == 1 || metodePembayaran == 2) {
-                jenisPembayaran = (metodePembayaran == 1) ? "QRIS" : "Transfer Bank";
-                charge = CHARGE_CASHLESS;
-            } else {
-                System.out.println("Pilihan metode pembayaran cashless tidak valid.");
-            }
+            jenisPembayaran = metodePembayaran == 1 ? "QRIS" : "Transfer Bank";
+            charge = CHARGE_CASHLESS;
         }
 
-        System.out.println("Metode Pembayaran: " + jenisPembayaran);
-        System.out.printf("Jumlah yang harus dibayarkan: %.2f + Charge: %.2f\n", total, charge);
+        System.out.println("\nMetode Pembayaran: " + jenisPembayaran);
+        if (charge > 0) {
+            System.out.printf("Charge: %.2f\n", charge);
+        }
+        System.out.printf("Jumlah yang harus dibayarkan: %.2f\n", total + charge);
 
         double bayar = 0, kembali = 0;
 
@@ -206,11 +205,11 @@ public class Kantin {
             }
         }
 
-        System.out.printf("Kembali: %.2f", kembali);
+        System.out.printf("Kembali: %.2f\n", kembali);
         transactions[transactionCount] = new String[]{pelanggan, jenisPembayaran, String.format("%.2f", hpp), String.format("%.2f", total), String.format("%.2f", bayar), String.format("%.2f", kembali)};
         transactionCount++;
-
-        System.out.println("\n1. Transaksi");
+        System.out.println("\n--- Menu ---");
+        System.out.println("1. Transaksi");
         System.out.println("2. Exit");
         System.out.print("Pilihan: ");
         int order = input.nextInt();
@@ -344,7 +343,8 @@ public class Kantin {
             System.out.printf("%-4s|%-20s|%-16s|%-12s|%-10s|%-12s|%-10s|%-10s\n", "No", "Pelanggan", "Jenis Pembayaran", "Hpp", "Total", "Bayar", "Kembali", "Keuntungan");
             
             for (int i = 0; i < transactionCount; i++) {
-                System.out.printf("%-4s|%-20s|%-16s|%-12s|%-10s|%-12s|%-10s|%-10s\n", (i + 1), transactions[i][0], transactions[i][1], transactions[i][2], transactions[i][3], transactions[i][4], transactions[i][5], Double.parseDouble(transactions[i][3]) - Double.parseDouble(transactions[i][2]));
+                boolean pelangganMember = isMember(transactions[i][0]);
+                System.out.printf("%-4s|%-20s|%-16s|%-12s|%-10s|%-12s|%-10s|%-10s\n", (i + 1), transactions[i][0] + (pelangganMember ? "(Member)" : ""), transactions[i][1], transactions[i][2], transactions[i][3], transactions[i][4], transactions[i][5], String.format("%.2f", Double.parseDouble(transactions[i][3]) - Double.parseDouble(transactions[i][2])));
             }
         }
     
@@ -356,14 +356,14 @@ public class Kantin {
                 for (int j = 0; j < menuItems[i].length; j++) {
                     int perubahan = stockAdjustments[i][j];
                     double nilai = perubahan * menuPrices[i][j];
-                    System.out.printf("%-4s|%-20s|%-10s|%-12s\n", (i * menuItems[i].length + j + 1), menuItems[i][j], perubahan, "Rp. " + nilai);
+                    System.out.printf("%-4s|%-20s|%-10s|%-12s\n", (i * menuItems[i].length + j + 1), menuItems[i][j], perubahan, nilai);
                 }
             }
         }
     
     private static int authenticateUser(Scanner input) {
         int userIndex = -1;
-        System.out.println("-----Log in-----");
+        System.out.println("\n-----Login-----");
         for (int attempts = 1; attempts <= MAX_ATTEMPTS; attempts++) {
             System.out.print("Masukkan username: ");
             String enteredUsername = input.nextLine();
