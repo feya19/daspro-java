@@ -318,7 +318,8 @@ public class Kantin {
             System.out.println("\n--- Report Menu ---");
             System.out.println("1. Report Penjualan");
             System.out.println("2. Report Penyesuaian");
-            System.out.println("3. Exit");
+            System.out.println("3. Report Stok");
+            System.out.println("4. Exit");
             System.out.print("Pilihan: ");
     
             int choice = input.nextInt();
@@ -331,6 +332,8 @@ public class Kantin {
                     generateReportPenyesuaian();
                     break;
                 case 3:
+                    generateReportStok();
+                case 4:
                     report(input, true);
                     break;
                 default:
@@ -359,6 +362,18 @@ public class Kantin {
                     int perubahan = stockAdjustments[i][j];
                     double nilai = perubahan * menuHpp[i][j];
                     System.out.printf("%-4s|%-20s|%-10s|%-12s\n", (i * menuItems[i].length + j + 1), menuItems[i][j], perubahan, nilai);
+                }
+            }
+        }
+
+        public static void generateReportStok() {
+            System.out.println("\n--- Report Stok ---");
+            System.out.printf("%-4s|%-20s|%-10s\n", "No", "Menu", "Stok");
+        
+            for (int i = 0; i < menuItems.length; i++) {
+                for (int j = 0; j < menuItems[i].length; j++) {
+                    int stok = stockAdjustments[i][j] + menuStock[i][j] - menuStockMutasi[i][j];
+                    System.out.printf("%-4s|%-20s|%-10s\n", (i * menuItems[i].length + j + 1), menuItems[i][j], stok);
                 }
             }
         }
