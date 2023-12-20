@@ -11,6 +11,8 @@ public class Kantin {
     private static final int MAX_ATTEMPTS = 3;
     private static final double CHARGE_CASHLESS = 1000;
 
+    static String[] categoryItems = {"Makanan", "Minuman"};
+
     static String[][] menuItems = {
         {"Nasi Goreng", "Mie Goreng", "Ayam Bakar"},
         {"Es Teh", "Es Jeruk", "Kopi"}
@@ -43,7 +45,7 @@ public class Kantin {
 
     static final int maxTransaction = 100;
     static int transactionCount = 0;
-    static String[][] transactions = new String[maxTransaction][7];
+    static String[][] transactions = new String[maxTransaction][6];
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
@@ -96,14 +98,14 @@ public class Kantin {
         boolean noProducts = true;
 
         while (true) {
-            System.out.println("\n--- Menu ---");
-            System.out.println("1. Makanan");
-            System.out.println("2. Minuman");
+            System.out.println("\n--- Kategori Menu ---");
+            for (int i = 0; i < categoryItems.length; i++) {
+                System.out.println(String.format("%d. %s", i + 1, categoryItems[i]));
+            }
             System.out.print("Pilihan: ");
-            int pilihan = input.nextInt();
+            int categoryIndex = input.nextInt() - 1;
 
-            if (pilihan == 1 || pilihan == 2) {
-                int categoryIndex = pilihan - 1; // Adjusting for array index
+            if (categoryItems[categoryIndex] != null) {
 
                 System.out.println("\nPilih menu:");
                 for (int i = 0; i < menuItems[categoryIndex].length; i++) {
@@ -111,13 +113,13 @@ public class Kantin {
                 }
                 System.out.print("Pilihan: ");
 
-                int itemChoice = input.nextInt();
-                if (itemChoice >= 1 && itemChoice <= menuItems[categoryIndex].length) {
-                    if (menuStock[categoryIndex][itemChoice - 1] > 0) {
+                int itemChoice = input.nextInt() - 1;
+                if (menuItems[categoryIndex][itemChoice] != null) {
+                    if (menuStock[categoryIndex][itemChoice] > 0) {
                         System.out.print("Masukkan Jumlah: ");
                         int jumlah = input.nextInt();
-                        if (menuStock[categoryIndex][itemChoice - 1] < jumlah) {
-                            System.out.println("Maaf, stok menu " + menuItems[categoryIndex][itemChoice - 1] + " tidak cukup.");
+                        if (menuStock[categoryIndex][itemChoice] < jumlah) {
+                            System.out.println("Maaf, stok menu " + menuItems[categoryIndex][itemChoice] + " tidak cukup.");
                             System.out.println("Tambah Menu Lain: (y/n)");
                             if (input.next().equalsIgnoreCase("n")) {
                                 input.nextLine();
@@ -126,7 +128,7 @@ public class Kantin {
                             continue;
                         }
 
-                        double harga = menuPrices[categoryIndex][itemChoice - 1];
+                        double harga = menuPrices[categoryIndex][itemChoice];
                         System.out.print("Masukkan Diskon (%): ");
                         double diskon = input.nextFloat() / 100;
                         System.out.print("Masukkan PPN (%): ");
@@ -137,13 +139,13 @@ public class Kantin {
                         double totalItem = (harga - hargaDiskon) * (1 + ppn);
                         total += totalItem;
 
-                        System.out.println("Total harga " + menuItems[categoryIndex][itemChoice - 1] + ": " + String.format("%.2f", totalItem));
-                        menuStock[categoryIndex][itemChoice - 1] -= jumlah;
-                        menuStockMutasi[categoryIndex][itemChoice - 1] += jumlah;
-                        hpp += menuHpp[categoryIndex][itemChoice - 1] * jumlah;
+                        System.out.println("Total harga " + menuItems[categoryIndex][itemChoice] + ": " + String.format("%.2f", totalItem));
+                        menuStock[categoryIndex][itemChoice] -= jumlah;
+                        menuStockMutasi[categoryIndex][itemChoice] += jumlah;
+                        hpp += menuHpp[categoryIndex][itemChoice] * jumlah;
                         noProducts = false;
                     } else {
-                        System.out.println("Maaf, stok menu " + menuItems[categoryIndex][itemChoice - 1] + " sudah habis.");
+                        System.out.println("Maaf, stok menu " + menuItems[categoryIndex][itemChoice] + " sudah habis.");
                     }
                     
                     System.out.println("Tambah Menu Lain: (y/n)");
@@ -234,69 +236,73 @@ public class Kantin {
 
             switch (choice) {
                 case 1:
-                    System.out.println("\n--- Edit Menu ---");
-                    for (int i = 0; i < menuItems.length; i++) {
-                        for (int j = 0; j < menuItems[i].length; j++) {
-                            System.out.println(String.format("%d. %s - Rp%.2f - Stock: %d", (i * menuItems[i].length + j + 1), menuItems[i][j], menuPrices[i][j], menuStock[i][j]));
-                        }
+                    System.out.println("\n--- Pilih Kategori ---");
+                    for (int i = 0; i < categoryItems.length; i++) {
+                        System.out.println(String.format("%d. %s", i + 1, categoryItems[i]));
                     }
-                    System.out.print("Pilih menu: ");
-                    int editMenuIndex = input.nextInt() - 1;
-
-                    if (editMenuIndex >= 0 && editMenuIndex < menuItems.length * menuItems[0].length) {
-                        System.out.println("\n--- Edit ---");
-                        System.out.println("1. Edit nama");
-                        System.out.println("2. Edit stok");
-                        System.out.println("3. Edit harga");
-                        System.out.println("4. Edit hpp");
-                        System.out.println("5. Kembali");
-                        System.out.print("Pilihan: ");
-
-                        int editOption = input.nextInt();
-                        input.nextLine();
-
-                        int categoryIndex = editMenuIndex / menuItems[0].length;
-                        int menuItemIndex = editMenuIndex % menuItems[0].length;
-
-                        switch (editOption) {
-                            case 1:
-                                // Edit item name
-                                System.out.print("Nama baru: ");
-                                String newName = input.nextLine();
-                                menuItems[categoryIndex][menuItemIndex] = newName;
-                                System.out.println("Nama menu berhasil diubah.");
-                                break;
-                            case 2:
-                                // Edit item stock
-                                System.out.print("Penyesuaian stok: ");
-                                int stockAdjustment = input.nextInt();
-                                menuStock[categoryIndex][menuItemIndex] = stockAdjustment;
-                                stockAdjustments[categoryIndex][menuItemIndex] += stockAdjustment * (stockAdjustment > menuStock[categoryIndex][menuItemIndex] ? 1 : -1);
-                                System.out.println("Stok menu berhasil diubah.");
-                                break;
-                            case 3:
-                                // Edit item price
-                                System.out.print("Harga baru: ");
-                                double newPrice = input.nextDouble();
-                                menuPrices[categoryIndex][menuItemIndex] = newPrice;
-                                System.out.println("Harga menu berhasil diubah.");
-                                break;
-                            case 4:
-                                // Edit item hpp
-                                System.out.print("Hpp baru: ");
-                                double newHpp = input.nextDouble();
-                                menuHpp[categoryIndex][menuItemIndex] = newHpp;
-                                System.out.println("Hpp menu berhasil diubah.");
-                                break;
-                            case 5:
-                                // Back to inventory menu
-                                break;
-                            default:
-                                System.out.println("Pilihan tidak valid.");
-                                break;
+                    System.out.print("Pilihan: ");
+                    int categoryIndex = input.nextInt() - 1;
+            
+                    if (categoryItems[categoryIndex] != null) {
+                        System.out.println("\n--- Edit Menu ---");
+                        for (int j = 0; j < menuItems[categoryIndex].length; j++) {
+                            System.out.println(String.format("%d. %s - Harga: Rp. %.2f - Stock: %d - Hpp: Rp. %.2f", j + 1, menuItems[categoryIndex][j], menuPrices[categoryIndex][j], menuStock[categoryIndex][j], menuHpp[categoryIndex][j]));
                         }
-                    } else {
-                        System.out.println("Pilihan menu tidak valid.");
+                        System.out.print("Pilih menu: ");
+                        int menuItemIndex = input.nextInt() - 1;
+                
+                        if (menuItems[categoryIndex][menuItemIndex] != null) {
+                            System.out.println("\n--- Edit ---");
+                            System.out.println("1. Edit nama");
+                            System.out.println("2. Edit stok");
+                            System.out.println("3. Edit harga");
+                            System.out.println("4. Edit hpp");
+                            System.out.println("5. Kembali");
+                            System.out.print("Pilihan: ");
+
+                            int editOption = input.nextInt();
+                            input.nextLine();
+
+                            switch (editOption) {
+                                case 1:
+                                    // Edit item name
+                                    System.out.print("Nama baru: ");
+                                    String newName = input.nextLine();
+                                    menuItems[categoryIndex][menuItemIndex] = newName;
+                                    System.out.println("Nama menu berhasil diubah.");
+                                    break;
+                                case 2:
+                                    // Edit item stock
+                                    System.out.print("Penyesuaian stok: ");
+                                    int stockAdjustment = input.nextInt();
+                                    menuStock[categoryIndex][menuItemIndex] = stockAdjustment;
+                                    stockAdjustments[categoryIndex][menuItemIndex] += stockAdjustment * (stockAdjustment > menuStock[categoryIndex][menuItemIndex] ? 1 : -1);
+                                    System.out.println("Stok menu berhasil diubah.");
+                                    break;
+                                case 3:
+                                    // Edit item price
+                                    System.out.print("Harga baru: ");
+                                    double newPrice = input.nextDouble();
+                                    menuPrices[categoryIndex][menuItemIndex] = newPrice;
+                                    System.out.println("Harga menu berhasil diubah.");
+                                    break;
+                                case 4:
+                                    // Edit item hpp
+                                    System.out.print("Hpp baru: ");
+                                    double newHpp = input.nextDouble();
+                                    menuHpp[categoryIndex][menuItemIndex] = newHpp;
+                                    System.out.println("Hpp menu berhasil diubah.");
+                                    break;
+                                case 5:
+                                    // Back to inventory menu
+                                    break;
+                                default:
+                                    System.out.println("Pilihan tidak valid.");
+                                    break;
+                            }
+                        } else {
+                            System.out.println("Pilihan kategori tidak valid.");
+                        }
                     }
                     break;
                 case 2:
