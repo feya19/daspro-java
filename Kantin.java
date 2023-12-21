@@ -91,6 +91,8 @@ public class Kantin {
         System.out.println("\n-----Transaksi-----");
         System.out.print("Masukkan nama pelanggan: ");
         String pelanggan = input.nextLine();
+        String pelangganStatus = isMember(pelanggan) ? "Member" : "Reguler";
+        System.out.printf("Pelanggan %s\n", pelangganStatus);
 
         double hpp = 0;
         double charge = 0;
@@ -115,10 +117,11 @@ public class Kantin {
 
                 int itemChoice = input.nextInt() - 1;
                 if (menuItems[categoryIndex][itemChoice] != null) {
-                    if (menuStock[categoryIndex][itemChoice] > 0) {
+                    int itemStock = menuStock[categoryIndex][itemChoice] - menuStockMutasi[categoryIndex][itemChoice];
+                    if (itemStock > 0) {
                         System.out.print("Masukkan Jumlah: ");
                         int jumlah = input.nextInt();
-                        if (menuStock[categoryIndex][itemChoice] < jumlah) {
+                        if (itemStock < jumlah) {
                             System.out.println("Maaf, stok menu " + menuItems[categoryIndex][itemChoice] + " tidak cukup.");
                             System.out.println("Tambah Menu Lain: (y/n)");
                             if (input.next().equalsIgnoreCase("n")) {
@@ -140,7 +143,6 @@ public class Kantin {
                         total += totalItem;
 
                         System.out.println("Total harga " + menuItems[categoryIndex][itemChoice] + ": " + String.format("%.2f", totalItem));
-                        menuStock[categoryIndex][itemChoice] -= jumlah;
                         menuStockMutasi[categoryIndex][itemChoice] += jumlah;
                         hpp += menuHpp[categoryIndex][itemChoice] * jumlah;
                         noProducts = false;
@@ -339,6 +341,7 @@ public class Kantin {
                     break;
                 case 3:
                     generateReportStok();
+                    break;
                 case 4:
                     report(input, true);
                     break;
